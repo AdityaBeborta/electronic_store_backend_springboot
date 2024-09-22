@@ -4,6 +4,7 @@ import com.electronicstore.dtos.UserDto;
 import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.services.UserService;
 import com.electronicstore.services.impl.UserServiceImpl;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/addUser")
-    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> saveUser(@Valid @RequestBody UserDto userDto){
         logger.info("user controller --> save user");
         UserDto user = this.userService.createUser(userDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/updateUser/{userId}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable String userId){
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable String userId){
         logger.info(("user controller -> updateUser() triggered"));
         UserDto userDto1 = this.userService.updateUser(userDto, userId);
         return new ResponseEntity<>(userDto1,HttpStatus.OK);

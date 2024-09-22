@@ -1,0 +1,20 @@
+steps for integrating validation API
+------------------------------------
+1.Add the below dependency to Pom.xml file
+<dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+
+2.Use annotations to perform bean property validation
+@NotBlank, @Size, @min, @max etc
+
+3.Enable the validation API
+Use the @Valid annotation at method parameter
+
+Custom Validation API
+---------------------
+1.create an interface and write
+public @interface validationAnnotationVariableName; --> to make a annotation
+
+2.
