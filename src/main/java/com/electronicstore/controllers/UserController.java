@@ -1,6 +1,7 @@
 package com.electronicstore.controllers;
 
 import com.electronicstore.dtos.UserDto;
+import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.services.UserService;
 import com.electronicstore.services.impl.UserServiceImpl;
 import org.slf4j.Logger;
@@ -43,10 +44,11 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable String userId){
+    public ResponseEntity<ApiResponseMessage> deleteUser(@PathVariable String userId){
+        ApiResponseMessage message = ApiResponseMessage.builder().message("User is removed / deleted successfully").success(true).status(HttpStatus.OK).build();
         logger.info("user controller -> deleteUser() ");
         this.userService.deleteUser(userId);
-        return new ResponseEntity<>("user removed successfully",HttpStatus.OK);
+        return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
     @GetMapping("/getUserByUserId/{userId}")
