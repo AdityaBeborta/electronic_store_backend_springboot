@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
         userDto.setUserId(userId);
         User user = this.modelMapper.map(userDto, User.class);
         User userFromDB = this.userRepository.save(user);
-        logger.info("Save the user --> ",userFromDB);
+        logger.info("Save the user {}",userFromDB);
         return this.modelMapper.map(userFromDB,UserDto.class);
     }
 
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         user.setAbout(userDto.getAbout());
         user.setImageName(userDto.getImageName());
         User updatedUser = this.userRepository.save(user);
-        logger.info("updated user--> ",updatedUser);
+        logger.info("updated user {}",updatedUser);
         return this.modelMapper.map(updatedUser,UserDto.class);
 
     }
@@ -66,15 +66,14 @@ public class UserServiceImpl implements UserService {
         List<User> allUser = this.userRepository.findAll();
         logger.info("all users {} ",allUser);
         //The {} placeholders make logging statements much cleaner and easier to read. Instead of manually concatenating strings, you can just pass the object, and SLF4J handles the interpolation.
-        List<UserDto> allUserDto = allUser.stream().map((user -> this.modelMapper.map(user, UserDto.class))).collect(Collectors.toList());
-        return allUserDto;
+        return allUser.stream().map((user -> this.modelMapper.map(user, UserDto.class))).collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserByUserId(String userId) {
         logger.info("get user by user id triggered ");
         User userFromDB = this.userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
-        logger.info("user by user id ",userFromDB);
+        logger.info("user by user id {}",userFromDB);
         return this.modelMapper.map(userFromDB,UserDto.class);
     }
 
@@ -82,7 +81,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserByEmail(String email) {
         logger.info("get user by email triggered");
         User userFromEmail = this.userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("user with the email not found "));
-        logger.info("user fetched from email ",userFromEmail);
+        logger.info("user fetched from email {}",userFromEmail);
         return this.modelMapper.map(userFromEmail,UserDto.class);
     }
 
@@ -90,7 +89,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> searchUser(String keyword) {
         logger.info("inside search user method");
         List<UserDto> searchUser = this.userRepository.findByNameContains(keyword).stream().map(user -> this.modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
-        logger.info("searched user -> ",searchUser);
+        logger.info("searched user {}",searchUser);
         return searchUser;
     }
 
@@ -99,7 +98,7 @@ public class UserServiceImpl implements UserService {
         logger.info("inside getUserByEmailAndPassword method");
         User userFromDBByEmailAndPassword = this.userRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new RuntimeException("user not found"));
         UserDto userDto = this.modelMapper.map(userFromDBByEmailAndPassword, UserDto.class);
-        logger.info("user from username and password ",userDto);
+        logger.info("user from username and password {}",userDto);
         return userDto;
     }
 
