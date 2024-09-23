@@ -1,6 +1,8 @@
 package com.electronicstore.controllers;
 import com.electronicstore.dtos.UserDto;
 import com.electronicstore.helper.ApiResponseMessage;
+import com.electronicstore.helper.ApplicationConstants;
+import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -28,9 +30,17 @@ public class UserController {
     }
 
     @GetMapping("/getAllUsers")
-    public ResponseEntity<List<UserDto>> getAllUser(){
-        logger.info("user controller -> getAllUser() triggered ");
-        List<UserDto> allUser = this.userService.getAllUser();
+    public ResponseEntity<PageableResponse<UserDto>> getAllUser(
+            @RequestParam(defaultValue = ApplicationConstants.PAGE_NUMBER, value = "pageNumber", required = false) Integer pageNumber,
+            @RequestParam(defaultValue = ApplicationConstants.PAGE_SIZE, value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(defaultValue = ApplicationConstants.SORT_BY_FIELD, value = "field", required = false) String field,
+            @RequestParam(defaultValue = ApplicationConstants.SORT_BY_DIRECTION, value = "direction", required = false) String direction
+    ){
+        logger.info("user controller pageNumber {}",pageNumber);
+        logger.info("user controller pageSize {}",pageSize);
+        logger.info("user controller field {}",field);
+        logger.info("user controller direction {}",direction);
+        PageableResponse<UserDto> allUser = this.userService.getAllUser(pageNumber, pageSize, field, direction);
         return new ResponseEntity<>(allUser,HttpStatus.OK);
     }
 

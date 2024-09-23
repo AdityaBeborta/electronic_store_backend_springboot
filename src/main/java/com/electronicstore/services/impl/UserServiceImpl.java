@@ -2,12 +2,16 @@ package com.electronicstore.services.impl;
 import com.electronicstore.dtos.UserDto;
 import com.electronicstore.entities.User;
 import com.electronicstore.exceptions.ResourceNotFoundException;
+import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.repositories.UserRepository;
 import com.electronicstore.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,12 +66,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUser() {
+    public PageableResponse<UserDto> getAllUser(int pageNumber, int pageSize, String field, String direction) {
         logger.info("get all user triggered");
-        List<User> allUser = this.userRepository.findAll();
-        logger.info("all users {} ",allUser);
-        //The {} placeholders make logging statements much cleaner and easier to read. Instead of manually concatenating strings, you can just pass the object, and SLF4J handles the interpolation.
-        return allUser.stream().map((user -> this.modelMapper.map(user, UserDto.class))).collect(Collectors.toList());
+        //coding for sorting
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(field).ascending() : Sort.by(field).descending();
+        //coding for pagination
+        PageRequest pageDetails = PageRequest.of(pageNumber, pageSize,sort);
+        //find all the users from DB using pagination inputs
+        Page<User> allUsersWithPagination = this.userRepository.findAll(pageDetails);
+        //get the contents
+        List<User> allUsersWithPaginationContents = allUsersWithPagination.getContent();
+        //convert user to userDto
+        List<UserDto> userDto = allUsersWithPaginationContents.stream().map((user -> this.modelMapper.map(user, UserDto.class))).collect(Collectors.toList());
+        //throw if userDto is null means there is no data in that page
+        if(allUsersWithPagination.getContent().size()==0){
+            throw new ResourceNotFoundException("page","page number",String.valueOf(allUsersWithPagination.getNumber()));
+        }
+        //create UserResponseWithPagination
+        PageableResponse pageableResponse = new PageableResponse();
+        pageableResponse.setContent(userDto);
+        pageableResponse.setLastPage(allUsersWithPagination.isLast());
+        pageableResponse.setPageSize(allUsersWithPagination.getSize());
+        pageableResponse.setTotalPages(allUsersWithPagination.getTotalPages());
+        pageableResponse.setPageNumber(allUsersWithPagination.getNumber());
+        pageableResponse.setTotalElements(allUsersWithPagination.getTotalElements());
+
+
+        return pageableResponse;
     }
 
     @Override
