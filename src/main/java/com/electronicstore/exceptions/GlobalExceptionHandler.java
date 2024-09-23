@@ -3,6 +3,7 @@ package com.electronicstore.exceptions;
 import com.electronicstore.helper.ApiResponseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -50,6 +51,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiResponseMessage> handleMethodArgumentException(MethodArgumentTypeMismatchException ex){
         logger.error("MethodArgumentTypeMismatchException {} ",ex.getMessage());
+        ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(true).status(HttpStatus.BAD_REQUEST).build();
+        return new ResponseEntity<>(apiRes,HttpStatus.BAD_REQUEST);
+    }
+
+    //Handle method property reference exception
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ApiResponseMessage> handleMethodArgumentException(PropertyReferenceException ex){
+        logger.error("PropertyReferenceException {} ",ex.getMessage());
         ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(true).status(HttpStatus.BAD_REQUEST).build();
         return new ResponseEntity<>(apiRes,HttpStatus.BAD_REQUEST);
     }
