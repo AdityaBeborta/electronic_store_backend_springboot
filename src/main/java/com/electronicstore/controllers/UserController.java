@@ -3,6 +3,7 @@ import com.electronicstore.dtos.UserDto;
 import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.PageableResponse;
+import com.electronicstore.services.FileService;
 import com.electronicstore.services.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
 import java.util.List;
 
 @RestController
@@ -21,6 +24,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FileService fileService;
 
     @PostMapping("/addUser")
     public ResponseEntity<UserDto> saveUser(@Valid @RequestBody UserDto userDto){
@@ -81,5 +87,12 @@ public class UserController {
 
 
     }
+
+    //upload the user image
+//    @PostMapping("/upload/image/{userId}")
+//    public ResponseEntity<ImageResponse> uploadUserImage(@RequestParam MultipartFile userImage,@PathVariable String userId){
+//        fileService.uploadFile(userImage,ApplicationConstants.IMAGE_UPLOAD_PATH)
+//
+//    }
 
 }
