@@ -2,6 +2,7 @@ package com.electronicstore.controllers;
 import com.electronicstore.dtos.UserDto;
 import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.helper.ApplicationConstants;
+import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.FileService;
 import com.electronicstore.services.UserService;
@@ -9,11 +10,14 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -21,6 +25,9 @@ import java.util.List;
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Value("${user.profile.image.path}")
+    private String imageUploadPath;
 
     @Autowired
     private UserService userService;
@@ -89,10 +96,16 @@ public class UserController {
     }
 
     //upload the user image
-//    @PostMapping("/upload/image/{userId}")
-//    public ResponseEntity<ImageResponse> uploadUserImage(@RequestParam MultipartFile userImage,@PathVariable String userId){
-//        fileService.uploadFile(userImage,ApplicationConstants.IMAGE_UPLOAD_PATH)
-//
-//    }
+    @PostMapping("/upload/image/{userId}")
+    public ResponseEntity<ImageResponse> uploadUserImage(@RequestParam("userImage") MultipartFile multiPartFile, @PathVariable String userId) throws IOException {
+        logger.info("user controller -> uploadUserImage() ");
+        String imageName = fileService.uploadFile(multiPartFile, imageUploadPath);
+        ImageResponse imageResponse = ImageResponse.builder().imageName(imageName).success(true).status(HttpStatus.CREATED).message("Profile picture uploaded successfully enjoy !").build();
+        UserDto userByUserId = this.userService.getUserByUserId(userId);
+        userByUserId.setImageName(imageName);
+        this.userService.updateUser(userByUserId,userId);
+        logger.info("Image response {}",imageResponse);
+        return new ResponseEntity<>(imageResponse,HttpStatus.CREATED);
+    }
 
 }
