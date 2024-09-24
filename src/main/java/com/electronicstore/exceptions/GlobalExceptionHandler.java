@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 
 import java.util.HashMap;
@@ -67,6 +68,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadApiRequest.class)
     public ResponseEntity<ApiResponseMessage> badApiRequestHandler(BadApiRequest ex){
         logger.error("BadApiRequest {} ",ex.getMessage());
+        ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(false).status(HttpStatus.BAD_REQUEST).build();
+        return new ResponseEntity<>(apiRes,HttpStatus.BAD_REQUEST);
+    }
+
+    //exception to handle files size too large exception
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponseMessage> fileSizeTooLargeException(MaxUploadSizeExceededException ex){
+        logger.error("MaxUploadSizeExceededException {} ",ex.getMessage());
         ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(false).status(HttpStatus.BAD_REQUEST).build();
         return new ResponseEntity<>(apiRes,HttpStatus.BAD_REQUEST);
     }
