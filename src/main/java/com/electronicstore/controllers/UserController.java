@@ -6,18 +6,23 @@ import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.FileService;
 import com.electronicstore.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -107,5 +112,20 @@ public class UserController {
         logger.info("Image response {}",imageResponse);
         return new ResponseEntity<>(imageResponse,HttpStatus.CREATED);
     }
+
+    //retrieve the profile picture by passing the userId
+    @GetMapping("/retrieve/profilepic/{userId}")
+    public void retrieveProfilePictureByUserId(@PathVariable String userId, HttpServletResponse httpServletResponse) throws IOException {
+        logger.info("retrieveProfilePictureByUserId triggered");
+        UserDto userByUserId = this.userService.getUserByUserId(userId);
+        logger.info(userByUserId.getName()+" image name :{} "+userByUserId.getImageName());
+        InputStream resource = this.fileService.getResource(imageUploadPath, userByUserId.getImageName());
+        httpServletResponse.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        //add to response
+        StreamUtils.copy(resource,httpServletResponse.getOutputStream());
+
+    }
+
+
 
 }
