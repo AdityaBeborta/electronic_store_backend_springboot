@@ -15,6 +15,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,15 @@ public class GlobalExceptionHandler {
         logger.error("MaxUploadSizeExceededException {} ",ex.getMessage());
         ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(false).status(HttpStatus.BAD_REQUEST).build();
         return new ResponseEntity<>(apiRes,HttpStatus.BAD_REQUEST);
+    }
+
+    //handle exception for File not found
+    //exception to handle files size too large exception
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<ApiResponseMessage> fileNotFoundException(FileNotFoundException ex){
+        logger.error("MaxUploadSizeExceededException {} ",ex.getMessage());
+        ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(false).status(HttpStatus.NOT_FOUND).build();
+        return new ResponseEntity<>(apiRes,HttpStatus.NOT_FOUND);
     }
 
 
