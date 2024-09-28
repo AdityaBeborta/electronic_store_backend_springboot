@@ -1,5 +1,6 @@
 package com.electronicstore.controllers;
 import com.electronicstore.dtos.UserDto;
+import com.electronicstore.exceptions.ResourceAlreadyExistException;
 import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.ImageResponse;
@@ -104,9 +105,12 @@ public class UserController {
     @PostMapping("/upload/image/{userId}")
     public ResponseEntity<ImageResponse> uploadUserImage(@RequestParam("userImage") MultipartFile multiPartFile, @PathVariable String userId) throws IOException {
         logger.info("user controller -> uploadUserImage() ");
+        UserDto userByUserId = this.userService.getUserByUserId(userId);
+        if(userByUserId.getImageName()!=null){
+            throw new ResourceAlreadyExistException("Profile picture","user",userId);
+        }
         String imageName = fileService.uploadFile(multiPartFile, imageUploadPath);
         ImageResponse imageResponse = ImageResponse.builder().imageName(imageName).success(true).status(HttpStatus.CREATED).message("Profile picture uploaded successfully enjoy !").build();
-        UserDto userByUserId = this.userService.getUserByUserId(userId);
         userByUserId.setImageName(imageName);
         this.userService.updateUser(userByUserId,userId);
         logger.info("Image response {}",imageResponse);
@@ -125,6 +129,15 @@ public class UserController {
         StreamUtils.copy(resource,httpServletResponse.getOutputStream());
 
     }
+
+    @PutMapping("/update/image/{userId}")
+    public ResponseEntity<ImageResponse> updateUserImage(@RequestParam("userImage") MultipartFile multiPartFile, @PathVariable String userId) throws IOException {
+        logger.info("user controller -> updateUserImage() ");
+        String  newProfileImageName = this.fileService.updateImage(multiPartFile, imageUploadPath, userId);
+        ImageResponse imageResponse = ImageResponse.builder().imageName(newProfileImageName).success(true).status(HttpStatus.CREATED).message("Profile picture updated successfully enjoy !").build();
+        return new ResponseEntity<>(imageResponse,HttpStatus.CREATED);
+    }
+
 
 
 

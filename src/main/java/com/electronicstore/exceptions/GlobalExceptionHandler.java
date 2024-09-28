@@ -89,6 +89,12 @@ public class GlobalExceptionHandler {
         ApiResponseMessage apiRes = ApiResponseMessage.builder().message(ex.getMessage()).success(false).status(HttpStatus.NOT_FOUND).build();
         return new ResponseEntity<>(apiRes,HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(ResourceAlreadyExistException.class)
+    public ResponseEntity<ApiResponseMessage> handleResourceAlreadyExistException(ResourceAlreadyExistException ex) {
+        ApiResponseMessage build = ApiResponseMessage.builder().message(ex.getMessage()).status(HttpStatus.BAD_REQUEST).success(true).build();
+        logger.error("Resource Already exist exception {} ", build);
+        return new ResponseEntity<>(build, HttpStatus.BAD_REQUEST);
+    }
 
 
 }
