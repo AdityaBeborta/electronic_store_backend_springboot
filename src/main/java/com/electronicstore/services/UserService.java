@@ -4,6 +4,7 @@ import com.electronicstore.dtos.UserDto;
 import com.electronicstore.helper.PageableResponse;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -16,7 +17,7 @@ public interface UserService {
     UserDto updateUser(UserDto userDto, String userId);
 
     //delete
-    void deleteUser(String userId);
+    void deleteUser(String userId) throws IOException;
 
     //get all user
     PageableResponse<UserDto> getAllUser(int pageNumber, int pageSize, String field, String direction);

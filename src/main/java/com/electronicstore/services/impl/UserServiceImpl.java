@@ -9,17 +9,25 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Value("${user.profile.image.path}")
+    private String imageUploadPath;
 
     @Autowired
     private UserRepository userRepository;
@@ -57,10 +65,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String userId) {
+    public void deleteUser(String userId) throws IOException {
         logger.info("delete user method triggered");
         User userFromDB = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user","user id",userId));
+        if(userFromDB.getImageName()!=null){
+            //remove from the server also
+            String completePathOfTheImage = imageUploadPath+ File.separator+userFromDB.getImageName();
+            Path pathObj = Path.of(completePathOfTheImage);
+            Files.delete(pathObj);
+        }
         this.userRepository.delete(userFromDB);
+
         logger.info("deleted successfully");
 
     }

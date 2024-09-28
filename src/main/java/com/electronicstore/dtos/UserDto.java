@@ -1,4 +1,5 @@
 package com.electronicstore.dtos;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -31,5 +32,6 @@ public class UserDto {
     private String about;
 
     //custom validation
+    @JsonIgnore
     private String imageName;
 }
