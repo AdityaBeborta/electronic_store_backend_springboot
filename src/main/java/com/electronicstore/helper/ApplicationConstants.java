@@ -5,7 +5,8 @@ import java.util.List;
 public class ApplicationConstants {
     public static final String PAGE_NUMBER = "0";
     public static final String PAGE_SIZE = "5";
-    public static final String SORT_BY_FIELD = "name";
+    public static final String SORT_BY_FIELD_USER = "name";
+    public static final String SORT_BY_FIELD_CATEGORY = "categoryTitle";
     public static final String SORT_BY_DIRECTION = "asc";
     public static final String IMAGE_UPLOAD_PATH = "asc";
 

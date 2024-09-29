@@ -52,7 +52,7 @@ public class UserController {
     public ResponseEntity<PageableResponse<UserDto>> getAllUser(
             @RequestParam(defaultValue = ApplicationConstants.PAGE_NUMBER, value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(defaultValue = ApplicationConstants.PAGE_SIZE, value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(defaultValue = ApplicationConstants.SORT_BY_FIELD, value = "field", required = false) String field,
+            @RequestParam(defaultValue = ApplicationConstants.SORT_BY_FIELD_USER, value = "field", required = false) String field,
             @RequestParam(defaultValue = ApplicationConstants.SORT_BY_DIRECTION, value = "direction", required = false) String direction
     ){
         logger.info("user controller pageNumber {}",pageNumber);
