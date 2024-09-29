@@ -11,7 +11,7 @@ public class Category {
 
     @Id
     private String categoryId;
-    @Column(unique = true)
+
     private String categoryTitle;
 
     private String categoryDescription;

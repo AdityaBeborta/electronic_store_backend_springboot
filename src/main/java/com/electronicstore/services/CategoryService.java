@@ -2,9 +2,11 @@ package com.electronicstore.services;
 
 import com.electronicstore.dtos.CategoryDto;
 import com.electronicstore.helper.ApiResponseMessage;
+import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface CategoryService {
@@ -25,12 +27,12 @@ public interface CategoryService {
     ApiResponseMessage deleteCategory(String categoryId);
 
     //add category image
-    CategoryDto uploadCategoryImage(MultipartFile multipartFile, String filePath, String categoryId);
+    ImageResponse uploadCategoryImage(MultipartFile multipartFile, String filePath, String categoryId) throws IOException;
 
     //retrieve category image passing categoryId
     void retrieveCategoryImage(String filePath, String fileName);
 
-    //get a single category with cate
+
 
 
 }

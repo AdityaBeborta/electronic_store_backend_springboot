@@ -2,8 +2,11 @@ package com.electronicstore.services.impl;
 
 import com.electronicstore.dtos.CategoryDto;
 import com.electronicstore.entities.Category;
+import com.electronicstore.exceptions.BadApiRequest;
 import com.electronicstore.exceptions.ResourceNotFoundException;
 import com.electronicstore.helper.ApiResponseMessage;
+import com.electronicstore.helper.ApplicationConstants;
+import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.repositories.CategoryRepository;
 import com.electronicstore.services.CategoryService;
@@ -18,6 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -76,8 +84,10 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(String categoryId, CategoryDto categoryDto) {
         CategoryDto categoryFromDB = this.getASingleCategory(categoryId);
         categoryFromDB.setCategoryDescription(categoryDto.getCategoryDescription());
+        categoryFromDB.setCategoryCoverImage(categoryDto.getCategoryCoverImage());
         categoryFromDB.setCategoryTitle(categoryDto.getCategoryTitle());
-        return this.addCategory(categoryFromDB);
+        Category save = this.categoryRepository.save(this.modelMapper.map(categoryDto, Category.class));
+        return this.modelMapper.map(save,CategoryDto.class);
     }
 
     @Override
@@ -89,8 +99,80 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto uploadCategoryImage(MultipartFile multipartFile, String filePath, String categoryId) {
-        return null;
+    public ImageResponse uploadCategoryImage(MultipartFile multipartFile, String filePath, String categoryId) throws IOException {
+
+        //find the category details with the category id
+        CategoryDto aSingleCategory = this.getASingleCategory(categoryId);
+
+        //Create an object of ImageResponse
+        ImageResponse imageResponse=new ImageResponse();
+
+        //now find the image details
+        String imageNameFromDB = aSingleCategory.getCategoryCoverImage();
+
+        //full path for new image
+        String fullPathNewWithCategoryImageName = "";
+
+        //full path for the existing image
+        String fullPathOldWithCategoryImageName = filePath + File.separator + imageNameFromDB;
+
+        //get the original file name
+        String originalCategoryImageName = multipartFile.getOriginalFilename();
+
+        //generate a unique name
+        String randomCategoryImageName = UUID.randomUUID().toString();
+
+        //now get the extension from the originalCategoryImageName
+
+        String originalCategoryImageExtension = originalCategoryImageName.substring(originalCategoryImageName.lastIndexOf("."));
+
+        //now append the unique file name with the extension
+        String uniqueCategoryImageName = randomCategoryImageName+originalCategoryImageExtension;
+
+        //full path with unique file name
+
+        fullPathNewWithCategoryImageName = filePath +File.separator+ uniqueCategoryImageName;
+
+
+
+        //now check if the extension is valid
+
+        if(ApplicationConstants.ALLOWED_FILE_TYPES.contains((originalCategoryImageExtension))){
+
+            //valid extension check if image is already exist
+
+            if(imageNameFromDB!=null){
+                //delete from the folder
+                Path of = Path.of(fullPathOldWithCategoryImageName);
+                Files.delete(of);
+            }
+
+            //if image does not exist the just update it
+
+            File folder = new File(filePath);
+            if(!folder.exists()){
+                //create a folder
+                logger.info("folder created");
+                folder.mkdirs();
+            }
+
+            //upload the file to fullPath
+            Files.copy(multipartFile.getInputStream(), Paths.get(fullPathNewWithCategoryImageName));
+            //now update the new profile in DB
+            aSingleCategory.setCategoryCoverImage(uniqueCategoryImageName);
+            this.updateCategory(categoryId,aSingleCategory);
+            imageResponse.setImageName(uniqueCategoryImageName);
+            imageResponse.setSuccess(true);
+            imageResponse.setStatus(HttpStatus.OK);
+            imageResponse.setMessage("successfully uploaded / updated the Image");
+            System.out.println(imageResponse);
+            return imageResponse;
+
+        }
+        else{
+            throw new BadApiRequest("The only allowed extension are "+ApplicationConstants.ALLOWED_FILE_TYPES);
+        }
+
     }
 
     @Override

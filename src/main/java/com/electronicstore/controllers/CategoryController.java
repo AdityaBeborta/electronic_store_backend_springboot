@@ -3,21 +3,28 @@ import com.electronicstore.dtos.CategoryDto;
 import com.electronicstore.dtos.UserDto;
 import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.helper.ApplicationConstants;
+import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.CategoryService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/electronicstore/category/v1")
 public class CategoryController {
+
+    @Value("${category.cover.image.path}")
+    private String imageUploadPath;
 
     @Autowired
     private CategoryService categoryService;
@@ -59,6 +66,14 @@ public class CategoryController {
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto categoryDto,@PathVariable String categoryId){
         return new ResponseEntity<>(this.categoryService.updateCategory(categoryId,categoryDto),HttpStatus.OK);
     }
+
+    @PostMapping("/uploadOrUpdateCategoryImage/{categoryId}")
+    public ResponseEntity<ImageResponse> uploadOrUpdateTheCategoryImage(@RequestParam("categoryImage") MultipartFile multipartFile,@PathVariable String categoryId) throws IOException {
+
+
+        return new ResponseEntity<>(this.categoryService.uploadCategoryImage(multipartFile,imageUploadPath,categoryId),HttpStatus.OK);
+    }
+
 
 
 
