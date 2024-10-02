@@ -2,6 +2,7 @@ package com.electronicstore.services.impl;
 
 import com.electronicstore.dtos.CategoryDto;
 import com.electronicstore.dtos.ProductDto;
+import com.electronicstore.entities.Category;
 import com.electronicstore.entities.Product;
 import com.electronicstore.exceptions.BadApiRequest;
 import com.electronicstore.exceptions.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.repositories.ProductRepository;
+import com.electronicstore.services.CategoryService;
 import com.electronicstore.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private CategoryService categoryService;
 
 
     @Override
@@ -207,5 +212,19 @@ public class ProductServiceImpl implements ProductService {
             throw new FileNotFoundException();
         }
         return inputStream;
+    }
+
+    @Override
+    public ProductDto createProductWithCategory(ProductDto productDto, String categoryId) {
+        //fetch the category details
+        CategoryDto categoryFromDB = this.categoryService.getASingleCategory(categoryId);
+        productDto.setCategory(categoryFromDB);
+        productDto.setAddedDate(new Date());
+        //create a product id
+        String productId = UUID.randomUUID().toString();
+        productDto.setProductId(productId);
+        Product productFromDB = this.productRepository.save(this.modelMapper.map(productDto, Product.class));
+        return this.modelMapper.map(productFromDB,ProductDto.class);
+
     }
 }

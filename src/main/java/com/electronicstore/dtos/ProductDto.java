@@ -1,6 +1,7 @@
 package com.electronicstore.dtos;
 
 
+import com.electronicstore.entities.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -27,4 +28,5 @@ public class ProductDto {
     private boolean live;
     private boolean stock;
     private String productImageName;
+    private CategoryDto category;
 }

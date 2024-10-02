@@ -97,4 +97,9 @@ public class ProductController {
 
     }
 
+    @PostMapping("addProduct/category/{categoryId}")
+    public ResponseEntity<ProductDto> createProductWithCategory(@Valid @RequestBody ProductDto productDto,@PathVariable String categoryId){
+        return new ResponseEntity<>(this.productService.createProductWithCategory(productDto,categoryId),HttpStatus.CREATED);
+    }
+
 }

@@ -31,5 +31,7 @@ public interface ProductService {
     ImageResponse uploadProductImage(MultipartFile multipartFile, String filePath, String productId) throws IOException;
     //retrieve product image passing productImage
     InputStream retrieveProductImage(String filePath, String fileName) throws FileNotFoundException;
+    //create a product with category
+    ProductDto createProductWithCategory(ProductDto productDto,String categoryId);
 
 }
