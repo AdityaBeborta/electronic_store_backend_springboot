@@ -6,6 +6,7 @@ import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface CategoryService {
     ImageResponse uploadCategoryImage(MultipartFile multipartFile, String filePath, String categoryId) throws IOException;
 
     //retrieve category image passing categoryId
-    void retrieveCategoryImage(String filePath, String fileName);
+    void retrieveCategoryImage(String filePath, String fileName) throws FileNotFoundException;
 
 
 
