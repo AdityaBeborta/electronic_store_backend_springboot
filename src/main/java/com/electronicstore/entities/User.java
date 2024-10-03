@@ -1,8 +1,5 @@
 package com.electronicstore.entities;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -26,4 +23,8 @@ public class User {
     private String about;
     @Column(name = "user_image_name")
     private String imageName;
+
+    //create a mapping of user with cart inn such a way that one user can have only one cart
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
 }
