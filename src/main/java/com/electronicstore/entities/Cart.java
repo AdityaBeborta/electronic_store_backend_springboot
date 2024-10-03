@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 public class Cart {
 
+    @Id
     private String cartId;
     private Date createdDate;
     private double totalCartPrice;
