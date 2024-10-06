@@ -20,7 +20,7 @@ public class CartItem {
 
     //Mapping CartItem with product
     //it is like one cart item can have only one product but quantity may differ
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 

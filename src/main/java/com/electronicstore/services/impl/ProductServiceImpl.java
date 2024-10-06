@@ -227,4 +227,24 @@ public class ProductServiceImpl implements ProductService {
         return this.modelMapper.map(productFromDB,ProductDto.class);
 
     }
+
+    @Override
+    public ProductDto updateProductQuantityByProductId(String productId , int requiredQuantity) {
+        ProductDto productDtoFromDB = this.getASingleProduct(productId);
+        int originalQuantity = productDtoFromDB.getQuantity();
+        int stockQuantity = originalQuantity-requiredQuantity;
+        ProductDto updatedProductDto = null;
+        if(originalQuantity!=0){
+            productDtoFromDB.setQuantity(stockQuantity);
+            productDtoFromDB.setStock(true);
+            updatedProductDto=updateExistingProduct(productDtoFromDB,productId);
+            return updatedProductDto;
+        }
+        else{
+            productDtoFromDB.setStock(false);
+            updatedProductDto=updateExistingProduct(productDtoFromDB,productId);
+            throw new BadApiRequest("Out of stock");
+        }
+
+    }
 }

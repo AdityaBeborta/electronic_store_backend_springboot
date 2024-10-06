@@ -2,13 +2,14 @@ package com.electronicstore.dtos;
 
 import com.electronicstore.entities.CartItem;
 import com.electronicstore.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-@ToString
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -18,6 +19,9 @@ public class CartDto {
     private Date createdDate;
     private double totalCartPrice;
     private int totalNumberOfItemsInCart;
-    private UserDto userDto;
-    private List<CartItemDto> cartItemDto=new ArrayList<>();
+    @JsonIgnore
+    private UserDto user;
+    private List<CartItemDto> cartItems=new ArrayList<>();
+
+
 }
