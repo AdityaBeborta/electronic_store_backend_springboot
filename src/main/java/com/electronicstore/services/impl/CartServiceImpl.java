@@ -101,18 +101,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ApiResponseMessage removeItemFromCart(String userId, CartItemRequest cartItemRequest) {
+    public CartDto removeItemFromCart(String userId, CartItemRequest cartItemRequest) {
         //get the product id and product quantity from the request
         String productId = cartItemRequest.getProductId();
         int quantity = cartItemRequest.getQuantity();
+        Product product = this.productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("product", "product id", productId));
         //if request quantity is less than zero or negative or equal to zero throw exception
         if (quantity <= 0) {
             throw new BadApiRequest("Quantity must be greater than zero");
         }
-        //get the product details
-        Product product = this.productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("product", "product id", productId));
-        this.modelMapper.map(this.productService.updateProductQuantityByProductId(productId, quantity, ApplicationConstants.REMOVE_ITEM_FROM_CART), Product.class);
-
         /*find user from user find the cart from cart find the cartItemId if*/
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "user id", userId));
         //now get the cart from the user
@@ -127,6 +124,10 @@ public class CartServiceImpl implements CartService {
         CartItem singleItemInTheCart = existingItemsInUsersCart.stream().filter(item -> item.getProduct().getProductId().equals(productId)).findFirst().orElseThrow(() -> new ResourceNotFoundException("product ", "product id", productId));
         //now we got the product which we want to remove from the list of products
         //so, we need to check what is the quantity if more than one we need to reduce with the request quantity
+        if (quantity > singleItemInTheCart.getQuantity()) {
+            throw new BadApiRequest("Request quantity to be removed is more than the quantity present in the cart");
+        }
+        this.modelMapper.map(this.productService.updateProductQuantityByProductId(productId, quantity, ApplicationConstants.REMOVE_ITEM_FROM_CART), Product.class);
         if (singleItemInTheCart.getQuantity() <= quantity) {
             //it means that the user wants to remove the entire product
             //ex suppose I have iphone13 with quantity as 4 so now the requested quantity is 5 so, it will remove entirely
@@ -135,17 +136,16 @@ public class CartServiceImpl implements CartService {
             cartItemRepository.deleteById(singleItemInTheCart.getCartItemId());
         } else {
 
-            singleItemInTheCart.setTotalPriceAsPerQuantity(singleItemInTheCart.getQuantity()*singleItemInTheCart.getProduct().getPrice());
+            singleItemInTheCart.setTotalPriceAsPerQuantity(singleItemInTheCart.getQuantity() * singleItemInTheCart.getProduct().getPrice());
         }
         //now calculate the updated quantity and price
         singleItemInTheCart.setQuantity(singleItemInTheCart.getQuantity() - quantity);
-        singleItemInTheCart.setProduct(product);
         cart.setCartItems(existingItemsInUsersCart);
         CartItemDetails cartDetails = getCartDetails(cart);
         cart.setTotalNumberOfItemsInCart(cartDetails.getTotalQuantity());
         cart.setTotalCartPrice(cartDetails.getTotalPrice());
-        this.cartRepository.save(cart);
-        return ApiResponseMessage.builder().message("updated").success(true).status(HttpStatus.OK).build();
+        Cart updatedCart = this.cartRepository.save(cart);
+        return this.modelMapper.map(updatedCart,CartDto.class);
     }
 
     @Override

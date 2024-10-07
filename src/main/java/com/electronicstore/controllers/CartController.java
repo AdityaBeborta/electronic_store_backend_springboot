@@ -30,7 +30,7 @@ public class CartController {
     }
 
     @PostMapping("/remove/{userId}")
-    public ResponseEntity<ApiResponseMessage> removeItemFromCart(@RequestBody CartItemRequest cartItemRequest, @PathVariable String userId) {
+    public ResponseEntity<CartDto> removeItemFromCart(@RequestBody CartItemRequest cartItemRequest, @PathVariable String userId) {
         return new ResponseEntity<>(this.cartService.removeItemFromCart(userId, cartItemRequest), HttpStatus.OK);
     }
 
