@@ -9,17 +9,21 @@ import com.electronicstore.entities.User;
 import com.electronicstore.exceptions.BadApiRequest;
 import com.electronicstore.exceptions.ResourceNotFoundException;
 import com.electronicstore.helper.ApiResponseMessage;
+import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.CartItemDetails;
+import com.electronicstore.helper.CartItemRequest;
 import com.electronicstore.repositories.CartItemRepository;
 import com.electronicstore.repositories.CartRepository;
 import com.electronicstore.repositories.ProductRepository;
 import com.electronicstore.repositories.UserRepository;
 import com.electronicstore.services.CartService;
 import com.electronicstore.services.ProductService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -56,7 +60,7 @@ public class CartServiceImpl implements CartService {
         if (product.get().getQuantity() < quantity) {
             throw new BadApiRequest("out of stock");
         }
-        product.set(this.modelMapper.map(this.productService.updateProductQuantityByProductId(productId, quantity), Product.class));
+        product.set(this.modelMapper.map(this.productService.updateProductQuantityByProductId(productId, quantity, ApplicationConstants.ADD_ITEM_TO_CART), Product.class));
         Cart cart = user.getCart();
         if (cart == null) {
             logger.info("cart does not exist");
@@ -97,8 +101,51 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ApiResponseMessage removeItemFromCart(String userId, int cartItemId) {
-        return null;
+    public ApiResponseMessage removeItemFromCart(String userId, CartItemRequest cartItemRequest) {
+        //get the product id and product quantity from the request
+        String productId = cartItemRequest.getProductId();
+        int quantity = cartItemRequest.getQuantity();
+        //if request quantity is less than zero or negative or equal to zero throw exception
+        if (quantity <= 0) {
+            throw new BadApiRequest("Quantity must be greater than zero");
+        }
+        //get the product details
+        Product product = this.productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("product", "product id", productId));
+        this.modelMapper.map(this.productService.updateProductQuantityByProductId(productId, quantity, ApplicationConstants.REMOVE_ITEM_FROM_CART), Product.class);
+
+        /*find user from user find the cart from cart find the cartItemId if*/
+        User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "user id", userId));
+        //now get the cart from the user
+        Cart cart = user.getCart();
+        //check if the user already have a cart -- if not then throw exception
+        if (cart == null) {
+            throw new ResourceNotFoundException("cart not found", "user id", userId);
+        }
+        //at this step it means that the user have a cart so from the cart get the items
+        List<CartItem> existingItemsInUsersCart = cart.getCartItems();
+        //now check if that product which you want to remove exists in the user's cart or not
+        CartItem singleItemInTheCart = existingItemsInUsersCart.stream().filter(item -> item.getProduct().getProductId().equals(productId)).findFirst().orElseThrow(() -> new ResourceNotFoundException("product ", "product id", productId));
+        //now we got the product which we want to remove from the list of products
+        //so, we need to check what is the quantity if more than one we need to reduce with the request quantity
+        if (singleItemInTheCart.getQuantity() <= quantity) {
+            //it means that the user wants to remove the entire product
+            //ex suppose I have iphone13 with quantity as 4 so now the requested quantity is 5 so, it will remove entirely
+            existingItemsInUsersCart.remove(singleItemInTheCart);
+            //now delete it from the database even
+            cartItemRepository.deleteById(singleItemInTheCart.getCartItemId());
+        } else {
+
+            singleItemInTheCart.setTotalPriceAsPerQuantity(singleItemInTheCart.getQuantity()*singleItemInTheCart.getProduct().getPrice());
+        }
+        //now calculate the updated quantity and price
+        singleItemInTheCart.setQuantity(singleItemInTheCart.getQuantity() - quantity);
+        singleItemInTheCart.setProduct(product);
+        cart.setCartItems(existingItemsInUsersCart);
+        CartItemDetails cartDetails = getCartDetails(cart);
+        cart.setTotalNumberOfItemsInCart(cartDetails.getTotalQuantity());
+        cart.setTotalCartPrice(cartDetails.getTotalPrice());
+        this.cartRepository.save(cart);
+        return ApiResponseMessage.builder().message("updated").success(true).status(HttpStatus.OK).build();
     }
 
     @Override
@@ -111,10 +158,10 @@ public class CartServiceImpl implements CartService {
         User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "user id", userId));
         //get the cart from user
         Cart cart = user.getCart();
-        if(cart==null){
-            throw new ResourceNotFoundException("cart ","user id",userId);
+        if (cart == null) {
+            throw new ResourceNotFoundException("cart ", "user id", userId);
         }
-        return this.modelMapper.map(cart,CartDto.class);
+        return this.modelMapper.map(cart, CartDto.class);
     }
 
     public CartItemDetails getCartDetails(Cart cart) {

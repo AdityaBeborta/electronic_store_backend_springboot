@@ -66,13 +66,13 @@ public class ProductServiceImpl implements ProductService {
         oldProduct.setStock(productDto.isStock());
         oldProduct.setProductImageName(productDto.getProductImageName());
         Product updatedProduct = this.productRepository.save(this.modelMapper.map(oldProduct, Product.class));
-        return this.modelMapper.map(updatedProduct,ProductDto.class);
+        return this.modelMapper.map(updatedProduct, ProductDto.class);
     }
 
     @Override
     public ApiResponseMessage deleteExistingProduct(String productId) {
         ProductDto aSingleProduct = this.getASingleProduct(productId);
-        this.productRepository.delete(this.modelMapper.map(aSingleProduct,Product.class));
+        this.productRepository.delete(this.modelMapper.map(aSingleProduct, Product.class));
         ApiResponseMessage apiRes = ApiResponseMessage.builder().status(HttpStatus.OK).success(true).message("product deleted successfully").build();
         return apiRes;
     }
@@ -91,8 +91,8 @@ public class ProductServiceImpl implements ProductService {
         PageRequest pageableRequest = PageRequest.of(pageNumber, pageSize, sort);
         Page<Product> allProductsWithPagination = this.productRepository.findAll(pageableRequest);
         List<Product> allProductsWithContentOnly = allProductsWithPagination.getContent();
-        if(allProductsWithPagination.getContent().size()==0){
-            throw new ResourceNotFoundException("page","page number",String.valueOf(allProductsWithPagination.getNumber()));
+        if (allProductsWithPagination.getContent().size() == 0) {
+            throw new ResourceNotFoundException("page", "page number", String.valueOf(allProductsWithPagination.getNumber()));
         }
         PageableResponse pageableResponse = new PageableResponse();
         pageableResponse.setContent(allProductsWithContentOnly.stream().map(product -> this.modelMapper.map(product, ProductDto.class)).collect(Collectors.toList()));
@@ -131,11 +131,11 @@ public class ProductServiceImpl implements ProductService {
         System.out.println(aSingleProduct);
 
         //Create an object of ImageResponse
-        ImageResponse imageResponse=new ImageResponse();
+        ImageResponse imageResponse = new ImageResponse();
 
         //now find the image details
         String imageNameFromDB = aSingleProduct.getProductImageName();
-        System.out.println("imageNameFromDB "+imageNameFromDB);
+        System.out.println("imageNameFromDB " + imageNameFromDB);
 
         //full path for new image
         String fullPathNewWithProductImageName = "";
@@ -154,21 +154,20 @@ public class ProductServiceImpl implements ProductService {
         String originalProductImageExtension = originalProductImageName.substring(originalProductImageName.lastIndexOf("."));
 
         //now append the unique file name with the extension
-        String uniqueProductImageName = randomProductImageName+originalProductImageExtension;
+        String uniqueProductImageName = randomProductImageName + originalProductImageExtension;
 
         //full path with unique file name
 
-        fullPathNewWithProductImageName = filePath +File.separator+ uniqueProductImageName;
-
+        fullPathNewWithProductImageName = filePath + File.separator + uniqueProductImageName;
 
 
         //now check if the extension is valid
 
-        if(ApplicationConstants.ALLOWED_FILE_TYPES.contains((originalProductImageExtension))){
+        if (ApplicationConstants.ALLOWED_FILE_TYPES.contains((originalProductImageExtension))) {
 
             //valid extension check if image is already exist
 
-            if(imageNameFromDB!=null){
+            if (imageNameFromDB != null) {
                 System.out.println("image name fro DB is not null");
                 //delete from the folder
                 Path of = Path.of(fullPathOldWithProductImageName);
@@ -179,7 +178,7 @@ public class ProductServiceImpl implements ProductService {
             System.out.println("not inside IF");
 
             File folder = new File(filePath);
-            if(!folder.exists()){
+            if (!folder.exists()) {
                 //create a folder
 
                 folder.mkdirs();
@@ -189,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
             Files.copy(multipartFile.getInputStream(), Paths.get(fullPathNewWithProductImageName));
             //now update the new profile in DB
             aSingleProduct.setProductImageName(uniqueProductImageName);
-            this.updateExistingProduct(aSingleProduct,productId);
+            this.updateExistingProduct(aSingleProduct, productId);
             imageResponse.setImageName(uniqueProductImageName);
             imageResponse.setSuccess(true);
             imageResponse.setStatus(HttpStatus.OK);
@@ -197,9 +196,8 @@ public class ProductServiceImpl implements ProductService {
             System.out.println(imageResponse);
             return imageResponse;
 
-        }
-        else{
-            throw new BadApiRequest("The only allowed extension are "+ApplicationConstants.ALLOWED_FILE_TYPES);
+        } else {
+            throw new BadApiRequest("The only allowed extension are " + ApplicationConstants.ALLOWED_FILE_TYPES);
         }
 
     }
@@ -208,7 +206,7 @@ public class ProductServiceImpl implements ProductService {
     public InputStream retrieveProductImage(String path, String name) throws FileNotFoundException {
         String fullPath = path + File.separator + name;
         InputStream inputStream = new FileInputStream(fullPath);
-        if(inputStream==null){
+        if (inputStream == null) {
             throw new FileNotFoundException();
         }
         return inputStream;
@@ -224,25 +222,29 @@ public class ProductServiceImpl implements ProductService {
         String productId = UUID.randomUUID().toString();
         productDto.setProductId(productId);
         Product productFromDB = this.productRepository.save(this.modelMapper.map(productDto, Product.class));
-        return this.modelMapper.map(productFromDB,ProductDto.class);
+        return this.modelMapper.map(productFromDB, ProductDto.class);
 
     }
 
     @Override
-    public ProductDto updateProductQuantityByProductId(String productId , int requiredQuantity) {
+    public ProductDto updateProductQuantityByProductId(String productId, int requiredQuantity, String action) {
         ProductDto productDtoFromDB = this.getASingleProduct(productId);
+        int stockQuantity = 0;
         int originalQuantity = productDtoFromDB.getQuantity();
-        int stockQuantity = originalQuantity-requiredQuantity;
+        if (action.equalsIgnoreCase(ApplicationConstants.ADD_ITEM_TO_CART)) {
+            stockQuantity = originalQuantity - requiredQuantity;
+        } else if(action.equalsIgnoreCase(ApplicationConstants.REMOVE_ITEM_FROM_CART)) {
+            stockQuantity = originalQuantity + requiredQuantity;
+        }
         ProductDto updatedProductDto = null;
-        if(originalQuantity!=0){
+        if (originalQuantity != 0) {
             productDtoFromDB.setQuantity(stockQuantity);
             productDtoFromDB.setStock(true);
-            updatedProductDto=updateExistingProduct(productDtoFromDB,productId);
+            updatedProductDto = updateExistingProduct(productDtoFromDB, productId);
             return updatedProductDto;
-        }
-        else{
+        } else {
             productDtoFromDB.setStock(false);
-            updatedProductDto=updateExistingProduct(productDtoFromDB,productId);
+            updatedProductDto = updateExistingProduct(productDtoFromDB, productId);
             throw new BadApiRequest("Out of stock");
         }
 

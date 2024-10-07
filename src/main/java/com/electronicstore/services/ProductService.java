@@ -34,6 +34,6 @@ public interface ProductService {
     //create a product with category
     ProductDto createProductWithCategory(ProductDto productDto,String categoryId);
 
-    ProductDto updateProductQuantityByProductId(String productId, int quantity);
+    ProductDto updateProductQuantityByProductId(String productId, int quantity,String action);
 
 }

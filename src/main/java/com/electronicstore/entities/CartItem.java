@@ -26,7 +26,7 @@ public class CartItem {
 
     //Mapping CartItem with Cart
     //it is like multiple cart item can belong to one cart
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
