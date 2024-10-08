@@ -10,7 +10,7 @@ public interface CartService {
 
     CartDto removeItemFromCart(String userId, CartItemRequest cartItemRequest);
 
-    ApiResponseMessage removeAllItemsFromCart(String userId);
+    CartDto removeAllItemsFromCart(String userId);
 
     CartDto getCartByUserId(String userId);
 }
