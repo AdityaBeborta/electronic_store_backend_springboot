@@ -27,6 +27,6 @@ public class Cart {
     private User user;
 
     //creating mapping for cartItem in such a way that one cart can have multiple cart item
-    @OneToMany(fetch = FetchType.EAGER,cascade ={CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH},mappedBy = "cart")
-    private List<CartItem> cartItems=new ArrayList<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.ALL}, orphanRemoval = true,mappedBy = "cart")
+    private List<CartItem> cartItems = new ArrayList<>();
 }

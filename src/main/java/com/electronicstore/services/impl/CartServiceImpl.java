@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -70,17 +71,14 @@ public class CartServiceImpl implements CartService {
         }
         List<CartItem> cartItems = cart.getCartItems();
         //check if the product already exist
-        List<CartItem> updatedItems = cartItems.stream().map(item -> {
+        cartItems.forEach(item -> {
             if (item.getProduct().getProductId().equals(productId)) {
-                logger.info("product already exist so increase the quantity and price");
                 item.setQuantity(item.getQuantity() + quantity);
                 item.setTotalPriceAsPerQuantity(item.getQuantity() * product.get().getPrice());
                 updated.set(true);
             }
-            return item;
-        }).collect(Collectors.toList());
-        //set items in the cart
-        cart.setCartItems(updatedItems);
+        });
+
         if (!updated.get()) {
             logger.info("add new items");
             CartItem cartItem = CartItem.builder()
@@ -146,12 +144,52 @@ public class CartServiceImpl implements CartService {
         cart.setTotalNumberOfItemsInCart(cartDetails.getTotalQuantity());
         cart.setTotalCartPrice(cartDetails.getTotalPrice());
         Cart updatedCart = this.cartRepository.save(cart);
-        return this.modelMapper.map(updatedCart,CartDto.class);
+        return this.modelMapper.map(updatedCart, CartDto.class);
     }
 
     @Override
     public CartDto removeAllItemsFromCart(String userId) {
-        return null;
+        /*try to find the user whose cart you want to clear
+         * from that user get the list of cart item
+         * check if the cart have some item it means check the size of cart item it should be greater than zero
+         * traverse through the cart item and based on product id reduce the items quantity and add it to respective product
+         * */
+        //find the user from user id and if user doesn't exist throw an exception
+        User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "user id", userId));
+        //now get the cart
+        Cart cart = user.getCart();
+        //check if cart is empty
+        if (cart == null) {
+            throw new BadApiRequest("cart is not present for this user");
+        }
+        if (cart.getCartItems().isEmpty()) {
+            throw new BadApiRequest("cart is already empty");
+        }
+        //create a list where we need to store items id which we need to remove from the cart
+        List<Integer> cartItemIdsToDelete = new ArrayList<>();
+        //create a list of product whose quantity need to be updated
+        List<Product> productToBeUpdated = new ArrayList<>();
+        //get the list of items from the cart
+        List<CartItem> cartItems = cart.getCartItems();
+        for (CartItem productPresentInsideTheCart : cartItems) {
+            //get the cart item id's which needs to be removed
+            int cartItemId = productPresentInsideTheCart.getCartItemId();
+            //get the product which needs to be updated
+            Product product = productPresentInsideTheCart.getProduct();
+            //create a variable to store the updated the quantity
+            int updatedQuantity = product.getQuantity() + productPresentInsideTheCart.getQuantity();
+            product.setQuantity(updatedQuantity);
+            cartItemIdsToDelete.add(cartItemId);
+            productToBeUpdated.add(product);
+        }
+        cartItemRepository.deleteAllById(cartItemIdsToDelete);
+        productRepository.saveAll(productToBeUpdated);
+        //clear the cart
+        cart.getCartItems().clear();
+        cart.setTotalCartPrice(0);
+        cart.setTotalNumberOfItemsInCart(0);
+        Cart newCart = cartRepository.save(cart);
+        return modelMapper.map(newCart, CartDto.class);
     }
 
     @Override
@@ -169,7 +207,7 @@ public class CartServiceImpl implements CartService {
         //iterate and calculate the total price
         double totalPrice = cart.getCartItems().stream().mapToDouble(CartItem::getTotalPriceAsPerQuantity).sum();
         //get total count
-        System.out.println("total cart price "+totalPrice);
+        System.out.println("total cart price " + totalPrice);
         int sum = (int) cart.getCartItems().stream().filter(cartItem -> (cartItem.getCart().getCartId()).equals(cart.getCartId())).mapToDouble(CartItem::getQuantity).sum();
         return CartItemDetails.builder().totalPrice(totalPrice).totalQuantity(sum).build();
     }
