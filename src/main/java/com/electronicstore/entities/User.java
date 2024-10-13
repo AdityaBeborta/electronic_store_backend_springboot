@@ -2,6 +2,9 @@ package com.electronicstore.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -25,6 +28,11 @@ public class User {
     private String imageName;
 
     //create a mapping of user with cart inn such a way that one user can have only one cart
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY)
     private Cart cart;
+
+    //mapping for user and order
+    //one user can place multiple orders
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,mappedBy = "user")
+    private List<Order> orders = new ArrayList<>();
 }
