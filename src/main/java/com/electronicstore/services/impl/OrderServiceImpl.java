@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -57,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder().orderStatus(createOrderRequest.getOrderStatus()).paymentStatus(createOrderRequest.getPaymentStatus()).billingName(createOrderRequest.getBillingName())
                 .orderPlacedDate(new Date()).totalOrderAmount(totalCalculatedOrderPrice).orderId(UUID.randomUUID().toString()).paymentMode(createOrderRequest.getPaymentMode())
                 .billingAddress(createOrderRequest.getBillingAddress()).billingPhone(createOrderRequest.getBillingPhone()).orderDeliveredDate(null).user(user).build();
-//        logger.info("order details without orderItems {}", order);
+
 
         //now map the cart item details with order item details
         List<OrderItem> orderItemList = cartItems.stream().map(cartItem -> {
@@ -68,17 +69,17 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setProduct(cartItem.getProduct());
             return orderItem;
         }).collect(Collectors.toList());
-//        logger.info("order item list {}", orderItemList);
+
         //set the order items in the order
         order.setOrderItems(orderItemList);
         //now empty the cartItem and update the cart
         cartItems.clear();
         //save the order to repo
         Order placedOrder = this.orderRepository.save(order);
-        logger.info("order details {}", order);
+
         //save the updated cart to DB
         Cart updatedCart = this.cartRepository.save(cart);
-        logger.info("updated cart {}", updatedCart);
+
 
         return this.modelMapper.map(order, OrderDto.class);
     }
