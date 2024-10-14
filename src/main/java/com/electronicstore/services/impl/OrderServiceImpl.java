@@ -83,4 +83,23 @@ public class OrderServiceImpl implements OrderService {
 
         return this.modelMapper.map(order, OrderDto.class);
     }
+
+    @Override
+    public List<OrderDto> getOrdersByUserId(String userId) {
+        //first find the user by user id
+        User user = this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "user id", userId));
+        //since the user exist so try to find the order details by user
+        List<Order> usersOrder = this.orderRepository.findByUser(user);
+        //now check if user have some orders or not
+        if (usersOrder.size() == 0) throw new BadApiRequest("user don't have any order");
+        //since user have some orders so convert order to order dto
+        return usersOrder.stream().map((order) -> this.modelMapper.map(order, OrderDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public OrderDto getOrderDetailsByOrderId(String orderId) {
+        //try to find the order details by order id
+        Order order = this.orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("order", "order id", orderId));
+        return this.modelMapper.map(order, OrderDto.class);
+    }
 }
