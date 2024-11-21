@@ -1,8 +1,11 @@
 package com.electronicstore.services.impl;
 import com.electronicstore.dtos.UserDto;
+import com.electronicstore.entities.Roles;
 import com.electronicstore.entities.User;
 import com.electronicstore.exceptions.ResourceNotFoundException;
+import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.PageableResponse;
+import com.electronicstore.repositories.RoleRepository;
 import com.electronicstore.repositories.UserRepository;
 import com.electronicstore.services.UserService;
 import org.modelmapper.ModelMapper;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -35,14 +39,24 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    @Autowired
+    private RoleRepository roleRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public UserDto createUser(UserDto userDto) {
         //set the unique ID
+        Roles roles = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_GUEST).get();
         logger.info("create user method triggered");
         String userId = UUID.randomUUID().toString();
         userDto.setUserId(userId);
+        userDto.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
+        userDto.setRoles(List.of(roles));
         User user = this.modelMapper.map(userDto, User.class);
         User userFromDB = this.userRepository.save(user);
         logger.info("Save the user {}",userFromDB);

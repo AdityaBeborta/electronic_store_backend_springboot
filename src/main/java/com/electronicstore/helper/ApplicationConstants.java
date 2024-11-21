@@ -13,6 +13,9 @@ public class ApplicationConstants {
 
     public static final List<String> ALLOWED_FILE_TYPES = List.of(".jpg", ".png", ".jpeg");
 
-    public static final String ADD_ITEM_TO_CART="ADD";
-    public static final String REMOVE_ITEM_FROM_CART="REMOVE";
+    public static final String ADD_ITEM_TO_CART = "ADD";
+    public static final String REMOVE_ITEM_FROM_CART = "REMOVE";
+
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_GUEST = "ROLE_GUEST";
 }

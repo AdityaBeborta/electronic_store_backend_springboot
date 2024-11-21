@@ -1,11 +1,14 @@
 package com.electronicstore.dtos;
 import com.electronicstore.entities.Cart;
+import com.electronicstore.entities.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -37,4 +40,6 @@ public class UserDto {
     private String imageName;
 
     private CartDto cart;
+
+    private List<Roles> roles;
 }

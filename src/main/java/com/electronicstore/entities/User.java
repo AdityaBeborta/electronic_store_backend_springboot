@@ -1,4 +1,5 @@
 package com.electronicstore.entities;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,9 +18,9 @@ public class User {
     private String userId;
     @Column(name = "user_name")
     private String name;
-    @Column(name = "user_email",unique = true)
+    @Column(name = "user_email", unique = true)
     private String email;
-    @Column(name = "user_password",length = 10)
+    @Column(name = "user_password", length = 90)
     private String password;
     private String gender;
     @Column(length = 1000)
@@ -28,11 +29,19 @@ public class User {
     private String imageName;
 
     //create a mapping of user with cart inn such a way that one user can have only one cart
-    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Cart cart;
 
     //mapping for user and order
     //one user can place multiple orders
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
     private List<Order> orders = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinTable(
+            name ="user_role",
+            joinColumns = @JoinColumn(name = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "roleId")
+    )
+    private List<Roles> roles = new ArrayList<>();
 }
