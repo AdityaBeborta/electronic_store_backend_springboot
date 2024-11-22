@@ -5,6 +5,7 @@ import com.electronicstore.entities.User;
 import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.repositories.RoleRepository;
 import com.electronicstore.repositories.UserRepository;
+import com.electronicstore.services.impl.TransactionDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -33,6 +34,7 @@ public class ElectronicStoreApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        System.out.println(new TransactionDetails().getTransactionDetailsFromAccountNumber("12345"));
         Roles roleAdmin = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_ADMIN).orElse(null);
         Roles roleGuest = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_GUEST).orElse(null);
         if (roleAdmin == null) {
