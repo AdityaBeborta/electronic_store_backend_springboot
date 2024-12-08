@@ -34,7 +34,6 @@ public class ElectronicStoreApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println(new TransactionDetails().getTransactionDetailsFromAccountNumber("12345"));
         Roles roleAdmin = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_ADMIN).orElse(null);
         Roles roleGuest = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_GUEST).orElse(null);
         if (roleAdmin == null) {

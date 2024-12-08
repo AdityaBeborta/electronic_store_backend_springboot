@@ -6,6 +6,7 @@ import com.electronicstore.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','NORMAL')")
     @PostMapping("/placeOrder")
     public ResponseEntity<OrderDto> placeOrder(@RequestBody CreateOrderRequest createOrderRequest) {
         return new ResponseEntity<>(this.orderService.placeOrder(createOrderRequest), HttpStatus.CREATED);

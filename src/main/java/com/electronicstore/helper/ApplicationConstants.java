@@ -18,4 +18,30 @@ public class ApplicationConstants {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_GUEST = "ROLE_GUEST";
+    public static final String[] PUBLIC_URLS_GET = {
+            "/electronicstore/user/v1/**",
+            "/electronicstore/product/v1/**",
+            "/electronicstore/category/v1/**",
+            "/electronicstore/cart/v1/**",
+            "/electronicstore/orders/v1/**",
+    };
+    public static final String[] PROTECTED_URLS_POST = {
+            "/electronicstore/user/v1/**",
+    };
+    public static final String[] PROTECTED_URLS_POST_ADMIN_USER = {
+            "/electronicstore/product/v1/**",
+            "/electronicstore/category/v1/**",
+    };
+    public static final String[] PROTECTED_URLS_PUT_ADMIN_USER = {
+            "/electronicstore/product/v1/**",
+            "/electronicstore/category/v1/**",
+            "/electronicstore/orders/v1/**",
+    };
+    public static final String[] PROTECTED_URLS_DELETE_ADMIN_USER = {
+            "/electronicstore/product/v1/**",
+            "/electronicstore/category/v1/**",
+            "/electronicstore/user/v1/**",
+            "/electronicstore/orders/v1/**",
+    };
+
 }
