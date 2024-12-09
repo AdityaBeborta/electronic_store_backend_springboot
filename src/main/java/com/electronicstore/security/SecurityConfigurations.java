@@ -1,17 +1,14 @@
 package com.electronicstore.security;
-
 import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.jwt.CustomAccessDeniedHandler;
 import com.electronicstore.jwt.JwtAuthenticationEntryPoint;
 import com.electronicstore.jwt.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +19,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -66,7 +67,19 @@ public class SecurityConfigurations {
         //handling Session
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         //cors
-        http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable());
+        http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(new CorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                CorsConfiguration corsConfiguration = new CorsConfiguration();
+                corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+                corsConfiguration.setAllowedMethods(List.of("*"));
+                corsConfiguration.setAllowCredentials(true);
+                corsConfiguration.setAllowedHeaders(List.of("*"));
+                //preflight which client can keep it in cache memory
+                corsConfiguration.setMaxAge(3000L);
+                return corsConfiguration;
+            }
+        }));
         return http.build();
 
     }
