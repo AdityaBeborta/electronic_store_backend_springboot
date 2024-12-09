@@ -6,12 +6,15 @@ import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.repositories.RoleRepository;
 import com.electronicstore.repositories.UserRepository;
 import com.electronicstore.services.impl.TransactionDetails;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +37,7 @@ public class ElectronicStoreApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         Roles roleAdmin = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_ADMIN).orElse(null);
         Roles roleGuest = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_GUEST).orElse(null);
         if (roleAdmin == null) {
