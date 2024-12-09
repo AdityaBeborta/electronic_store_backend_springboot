@@ -18,3 +18,50 @@ Custom Validation API
 public @interface validationAnnotationVariableName; --> to make a annotation
 
 2.
+Let’s break this down in a simpler way by comparing **two different types of operations**:
+
+### 1. **Cart and CartItems Example (Adding to a List)**:
+```java
+cart.getCartItems().add(cartItem);
+```
+Here’s what is happening:
+- A **cart** can hold **many items** (think of a shopping cart in a store).
+- So, the `Cart` entity has a **list** (`List<CartItem> cartItems`) to hold multiple `CartItem` objects.
+- Each time you add an item to the cart, you use `cart.getCartItems().add(cartItem)`, which adds the new item (`cartItem`) to the **list** of existing items in the cart.
+
+The operation is needed because:
+- You’re managing a **collection of items** (the items in the cart).
+- You’re telling the system: “Add this new `CartItem` to my list of items in the cart.”
+
+### 2. **Post and Comment Example (Setting a Relationship)**:
+```java
+comment.setPost(post);
+comment.setUser(user);
+```
+Here’s what is happening:
+- A **comment** belongs to **one post** and is written by **one user**.
+- You are **associating** the `Comment` entity with a `Post` and a `User`, but you are not managing a collection of comments here.
+- When you say `comment.setPost(post)` and `comment.setUser(user)`, you are simply telling the system:
+  - “This `comment` belongs to this `post`.”
+  - “This `comment` was written by this `user`.”
+
+There is no list to update here because:
+- You are working with **single relationships**: One comment is linked to one post, and one comment is linked to one user.
+- You’re not adding this comment to a list of comments. You’re just setting the relationship so the comment knows which post and user it belongs to.
+
+---
+
+### Why Not Use `post.getComments().add(comment)` Here?
+In the post-comment scenario, you **could** have a list of comments in the `Post` entity, but in the code you shared, this isn't being done. Instead:
+- The goal of the `addComment` method is to **save a single comment** and link it to the post and the user.
+- Directly setting the relationships (`comment.setPost(post)`) is enough because you are just **linking** the comment to the post.
+
+### Simple Analogy:
+- **Cart and CartItems**: Think of it like a grocery list. You keep **adding items** to your list. The `cart.getCartItems().add(cartItem)` line is like adding an item to your list.
+- **Post and Comment**: Think of it like writing a note (comment) on a specific page (post). You just say, “This note belongs to this page.” You don’t need to maintain a collection of notes on that page; you just link the note to the page using `comment.setPost(post)`.
+
+### Recap:
+- **Cart Example**: We use `.add()` because we are adding multiple items to a list (the cart contains many items).
+- **Post Example**: We use `.set()` because we are just linking the comment to a post (one comment to one post).
+
+Does this help clear things up?
