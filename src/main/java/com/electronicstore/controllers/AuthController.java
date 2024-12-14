@@ -5,6 +5,7 @@ import com.electronicstore.jwt.JWTHelper;
 import com.electronicstore.jwt.JwtRequest;
 import com.electronicstore.jwt.JwtResponse;
 import com.electronicstore.services.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/electronicstore/auth/v1")
+@Tag(name = "Authentication Controller", description = "consists APIs which are used for authentication")
 public class AuthController {
 
     @Autowired

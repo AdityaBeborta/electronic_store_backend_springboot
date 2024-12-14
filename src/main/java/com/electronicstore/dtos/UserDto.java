@@ -2,6 +2,7 @@ package com.electronicstore.dtos;
 import com.electronicstore.entities.Cart;
 import com.electronicstore.entities.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @ToString
+@Schema(accessMode = Schema.AccessMode.READ_ONLY,description = "USER DTO SCHEMA")
 public class UserDto {
 
     private String userId;
@@ -39,6 +41,7 @@ public class UserDto {
     @JsonIgnore
     private String imageName;
 
+    @Schema(hidden = true)
     private CartDto cart;
 
     private List<Roles> roles;

@@ -7,6 +7,10 @@ import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.FileService;
 import com.electronicstore.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -28,6 +32,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/electronicstore/user/v1")
+@Tag(name = "User Controller", description = "consists APIs which are used to manage users")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -41,6 +46,13 @@ public class UserController {
     @Autowired
     private FileService fileService;
 
+    @Operation(summary = "create new user",description = "this method can be used to create a new user")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200",description = "successfully created a user"),
+                    @ApiResponse(responseCode = "401",description = "forbidden")
+            }
+    )
     @PostMapping("/addUser")
     public ResponseEntity<UserDto> saveUser(@Valid @RequestBody UserDto userDto){
         logger.info("user controller --> save user");
