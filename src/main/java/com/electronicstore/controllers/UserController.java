@@ -10,6 +10,7 @@ import com.electronicstore.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/electronicstore/user/v1")
 @Tag(name = "User Controller", description = "consists APIs which are used to manage users")
+@SecurityRequirement(name = "scheme default")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);

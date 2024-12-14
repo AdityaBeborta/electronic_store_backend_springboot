@@ -3,6 +3,7 @@ package com.electronicstore.controllers;
 import com.electronicstore.dtos.CreateOrderRequest;
 import com.electronicstore.dtos.OrderDto;
 import com.electronicstore.services.OrderService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/electronicstore/orders/v1")
 @Tag(name = "Order Controller", description = "consists APIs which are used to manage orders")
+@SecurityRequirement(name = "scheme default")
 public class OrderController {
 
     @Autowired

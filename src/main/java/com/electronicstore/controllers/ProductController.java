@@ -7,6 +7,7 @@ import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/electronicstore/product/v1")
 @Tag(name = "Product Controller", description = "consists APIs which are used to manage products")
+@SecurityRequirement(name = "scheme default")
 public class ProductController {
 
 

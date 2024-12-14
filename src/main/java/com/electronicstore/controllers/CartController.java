@@ -5,6 +5,7 @@ import com.electronicstore.helper.ApiResponseMessage;
 import com.electronicstore.helper.CartItemRequest;
 import com.electronicstore.services.CartService;
 import com.electronicstore.services.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/electronicstore/cart/v1")
 @Tag(name = "Cart Controller", description = "consists APIs which are used to manage cart")
+@SecurityRequirement(name = "scheme default")
 public class CartController {
 
     @Autowired

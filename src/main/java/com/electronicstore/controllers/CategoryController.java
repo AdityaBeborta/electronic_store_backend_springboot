@@ -6,6 +6,7 @@ import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.ImageResponse;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.services.CategoryService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/electronicstore/category/v1")
 @Tag(name = "Category Controller", description = "consists APIs which are used to manage category")
+@SecurityRequirement(name = "scheme default")
 public class CategoryController {
 
     @Value("${category.cover.image.path}")
