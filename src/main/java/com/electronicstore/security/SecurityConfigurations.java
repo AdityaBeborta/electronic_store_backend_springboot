@@ -49,6 +49,8 @@ public class SecurityConfigurations {
         //configuration for URL's
         http.authorizeHttpRequests(httpReq -> {
             httpReq
+
+                    .requestMatchers(ApplicationConstants.SWAGGER_URLS).permitAll()
                     .requestMatchers(HttpMethod.GET, ApplicationConstants.PUBLIC_URLS_GET).permitAll()
                     .requestMatchers(HttpMethod.POST, ApplicationConstants.PROTECTED_URLS_POST).permitAll()
                     .requestMatchers(HttpMethod.POST, ApplicationConstants.PROTECTED_URLS_POST_ADMIN_USER).hasRole("ADMIN")
