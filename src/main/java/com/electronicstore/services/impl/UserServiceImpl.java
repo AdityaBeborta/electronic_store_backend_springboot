@@ -2,12 +2,14 @@ package com.electronicstore.services.impl;
 import com.electronicstore.dtos.UserDto;
 import com.electronicstore.entities.Roles;
 import com.electronicstore.entities.User;
+import com.electronicstore.exceptions.ResourceAlreadyExistException;
 import com.electronicstore.exceptions.ResourceNotFoundException;
 import com.electronicstore.helper.ApplicationConstants;
 import com.electronicstore.helper.PageableResponse;
 import com.electronicstore.repositories.RoleRepository;
 import com.electronicstore.repositories.UserRepository;
 import com.electronicstore.services.UserService;
+import jakarta.validation.constraints.Null;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
+        //check if there exist a user with same email address
+        boolean userAlreadyExistWithSameEmailCheck = this.userRepository.findByEmail(userDto.getEmail()).isPresent();
+        if(userAlreadyExistWithSameEmailCheck){
+            throw new ResourceAlreadyExistException("user","email",userDto.getEmail());
+        }
         //set the unique ID
         Roles roles = this.roleRepository.findByRoleType(ApplicationConstants.ROLE_GUEST).get();
         logger.info("create user method triggered");
